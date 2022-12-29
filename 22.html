@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to text</title>
+    <link rel="stylesheet" href="../css/22.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.js"></script>
+</head>
+
+<body>
+    <center>
+        <h1 id="h1">Speech To Text Converter</h1>
+        <hr id="hr1">
+
+        <br>
+        <b>
+            <p style="padding: 15px;color: red; font-size: 3.75vw;font-family: sans-serif, cursive;display: inline-block;background-color: lightpink;border: 3px solid red;border-radius: 15px;">
+                Try saying these commands :
+                <br><br>
+                <i>Start Camera</i>
+                <br><br><i>Take A Selfie</i>
+                <br><br><i>Download Selfie</i>
+                <br><br><i>w <span style="color: green;">(Width) (your desired width)<br><br></span> h<span
+                        style="color: green;">(Height) (your desired height)</span></i>
+                <br><br><span style="color: blue;">Eg: w 500</span><br><span style="color: blue;">Eg: h 500</span>
+                <br><br><i><span style="color: green;">Tell A larger value for A Higher Resolution</span></i>
+            </p>
+        </b>
+        <span id="span1">
+            <div id="webcam"></div>
+            <div id="image"></div>
+        </span>
+        <div id="div1">
+            <textarea readonly="true" id="output"></textarea>
+            <br>
+            <button onclick="starte()">Start Listening</button>
+            <br>
+            <br><br><br><br><br>
+        </div>
+        <a id="l1" href="" download="Selfie_Photo.png"
+            style="display: none; font-size: 33px; font-weight: bold; text-decoration: none; color: green; background-color: lawngreen;">Download</a>
+        <canvas style="display: none;"></canvas>
+    </center>
+    <script>
+        var command = false;
+        var SpeechRecognition = window.webkitSpeechRecognition;
+        var recognition = new SpeechRecognition();
+        var text = "";
+
+        function starte() {
+            recognition.start();
+            speak3("listening");
+        };
+        recognition.onresult = function (event) {
+            text = event.results[0][0].transcript;
+            if (text == "start camera") {
+                command = true;
+                cam();
+                speak3("Starting camera");
+            } else if (text == "download selfie") {
+                command = true;
+                dl();
+            }
+            if (text == "take a selfie") {
+                command = true;
+                cam();
+                setTimeout(take_photo, 5000);
+                speak3("Taking your Selfie in 3 seconds");
+            } else {
+                arr1 = "";
+                if (text[0] = "w") {
+                    for (a = 1; a < text.length; a++) {
+                        if (text[a] !== " ") {
+                            arr1 += text[a];
+                        };
+                    };
+                } else if (text[0] = "h") {
+                    for (a = 1; a < text.length; a++) {
+                        if (text[a] !== " ") {
+                            arr1 += text[a];
+                        };
+                    };
+                };
+                arr1 = Number(arr1);
+                if (isNaN(arr1) == false && typeof arr1 == "number") {
+                    if (text[0] == "w") {
+                        command = true;
+                        w = arr1;
+                        speak3("Width Set To " + w + " pixels");
+                    } else if (text[0] == "h") {
+                        command = true;
+                        h = arr1;
+                        speak3("Height Set To " + h + " pixels");
+                    };
+                };
+            };
+            if (command == true) {
+                document.getElementById("output").innerHTML = "Command : [" + text + "]";
+            } else {
+                document.getElementById("output").innerHTML = "Speech : [" + text + "]";
+                speak3(text);
+            };
+            command = false;
+        };
+
+        function speak3(s) {
+            var sp = window.speechSynthesis;
+            var speak1 = new SpeechSynthesisUtterance(s);
+            sp.speak(speak1);
+        };
+        var camera = document.querySelector("#webcam");
+        var h = 100;
+        var w = 100;
+
+        function cam() {
+            Webcam.set({
+                height: 99999999999999999999999999999999999,
+                width: 99999999999999999999999999999999999999,
+                image_format: "png",
+                png_quality: 1000000000000000000000000000000
+            });
+            Webcam.attach(camera);
+            document.querySelector("video").style = "";
+        };
+        img = document.querySelector("#image");
+        var imgsrc = undefined;
+
+        function take_photo() {
+            canvas.height = h;
+            canvas.width = w;
+            videoimg = document.querySelector("video");
+            ctx.drawImage(videoimg, 0, 0, canvas.height, canvas.width);
+            imagesrc = canvas.toDataURL("image/png");
+            link.href = imagesrc;
+            img.innerHTML = "<img src='" + imagesrc + "'>";
+            link.style.display = "inline-block";
+        };
+        var link = document.querySelector("#l1");
+
+        function dl() {
+            if (imagesrc == undefined) {
+                speak3("Download Failed");
+            } else {
+                speak3("Downloading Your Selfie");
+                link.href = imagesrc;
+                link.click();
+            };
+        };
+        var canvas = document.querySelector("canvas");
+        var ctx = canvas.getContext("2d");
+    </script>
+</body>
+<script src="../js/22.js"></script>
+<!--
+        Webcam.snap(function (data_uri) {
+            document.getElementById("image").innerHTML = '<img id="Selfie_Photo" src="' + data_uri + '">';
+            link.style.display = "inline-block";
+            link.href = imagew.src;
+        });
+-->
